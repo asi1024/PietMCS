@@ -13,13 +13,10 @@ string res;
 
 vector<int> memo;
 vector<string> memor;
-set<pair<int,vector<int>>> se;
+map<vector<int>,int> se;
 
 void dfs(int s, int c) {
   if (c + 1 < (int)v.size()) return;
-  auto p = make_pair(c, v);
-  if (se.find(p) != se.end()) return;
-  se.insert(p);
   if (c < 0) return;
   if (c == 0 && (int)v.size() == 1) {
     int num = v[0];
@@ -29,6 +26,8 @@ void dfs(int s, int c) {
     }
     return;
   }
+  if (se[v] >= c) return;
+  se[v] = c;
   auto const_process = [](int s, int c, char n, string& res, vector<int>& v){
     res.push_back(n);
     dfs(s, c);
@@ -69,7 +68,7 @@ void dfs(int s, int c) {
     binary_push(lhs, rhs, res, v);
 
     tie(lhs, rhs) = binary_pop(v);
-    binary_process(s, c - 1, lhs * rhs, '*', res, v);
+    binary_process(s, c - 1, lhs * rhs > 3e4 ? 0 : lhs * rhs, '*', res, v);
     binary_push(lhs, rhs, res, v);
 
     tie(lhs, rhs) = binary_pop(v);
@@ -79,10 +78,11 @@ void dfs(int s, int c) {
     tie(lhs, rhs) = binary_pop(v);
     binary_process(s, c - 1, rhs == 0 ? 0 : lhs / rhs, '/', res, v);
     binary_push(lhs, rhs, res, v);
-
+    /*
     tie(lhs, rhs) = binary_pop(v);
     binary_process(s, c - 1, rhs == 0 ? 0 : lhs % rhs, '%', res, v);
     binary_push(lhs, rhs, res, v);
+    */
   }
 }
 
@@ -93,16 +93,39 @@ int main() {
   int depth = 0;
   for (int n = 1; n <= N; ++n) {
     while (memo[n] == -1) {
-      cerr << "DEPTH : " << depth << endl;
-      v.clear();
-      res.clear();
-      se.clear();
-      dfs(depth, depth);
-      ++depth;
+      if (n > 100 && depth == memo[n-1] + 2) {
+        memo[n] = memo[n-1] + 2;
+        memor[n] = memor[n-1] + "1+";
+      }
+      else if (n > 100 && depth == memo[n-2] + 3) {
+        memo[n] = memo[n-2] + 3;
+        memor[n] = memor[n-2] + "2+";
+      }
+      else if (n > 100 && depth == memo[n+1] + 2) {
+        memo[n] = memo[n+1] + 2;
+        memor[n] = memor[n+1] + "1-";
+      }
+      else if (n > 100 && depth == memo[n+2] + 3) {
+        memo[n] = memo[n+2] + 3;
+        memor[n] = memor[n+2] + "2-";
+      }
+      else {
+        if (depth == 22) break;
+        cerr << "DEPTH : " << depth << endl;
+        v.clear();
+        res.clear();
+        dfs(depth, depth);
+        ++depth;
+      }
     }
     cout << n << "\t";
-    cout << "cost : " << memo[n] << "\t";
-    cout << memor[n] << endl;
+    if (memo[n] == -1) {
+      cout << "NULL" << endl;
+    }
+    else {
+      cout << memo[n] << "\t";
+      cout << memor[n] << endl;
+    }
   }
   return 0;
 }
