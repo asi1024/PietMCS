@@ -68,7 +68,7 @@ void dfs(int s, int c) {
     binary_push(lhs, rhs, res, v);
 
     tie(lhs, rhs) = binary_pop(v);
-    binary_process(s, c - 1, lhs * rhs > 3e4 ? 0 : lhs * rhs, '*', res, v);
+    binary_process(s, c - 1, abs((long long)lhs * rhs) > 1e9 ? 0 : lhs * rhs, '*', res, v);
     binary_push(lhs, rhs, res, v);
 
     tie(lhs, rhs) = binary_pop(v);
@@ -87,7 +87,7 @@ void dfs(int s, int c) {
 }
 
 int main() {
-  N = 100000;
+  N = 1000;
   memo.assign(N+1, -1);
   memor.resize(N+1);
   int depth = 0;
@@ -110,7 +110,7 @@ int main() {
         memor[n] = memor[n+2] + "2-";
       }
       else {
-        if (depth == 22) break;
+        if (depth == 23) break;
         cerr << "DEPTH : " << depth << endl;
         v.clear();
         res.clear();
